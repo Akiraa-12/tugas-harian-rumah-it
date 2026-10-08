@@ -111,7 +111,7 @@ Baik:
 - fix: memperbaiki bug tombol tidak bisa diklik
 - docs: update README instalasi
 
-### 8. Conventional Commits
+ 8. Conventional Commits
 Format: tipe: deskripsi
 
 - feat: fitur baru -> feat: menambahkan fitur keranjang
@@ -143,19 +143,19 @@ Contoh baik:
 
 Lebih jelas daripada coba-coba atau punya-andi.
 
-### 12. Peran HTML, CSS, JS
+12. Peran HTML, CSS, JS
 - HTML: Struktur / kerangka
 - CSS: Tampilan / styling
 - JS: Interaksi / logika
 
-### 13. Lingkungan JavaScript
+13. Lingkungan JavaScript
 1. Browser: Untuk frontend interaktif
 2. Node.js:*Untuk backend / server
 
-### 14. JS vs ECMAScript
+ 14. JS vs ECMAScript
 - JS = bahasanya
 - ES = standarnya
 
-*Contoh:*
+Contoh:
 Lama (ES5): var nama = "Andi";
 Baru (ES6): const nama = "Andi";
