@@ -108,3 +108,109 @@ for (let huruf of "Kopi") {
 // potongan A : produk.nama adalah variabel biasa,produk[kunci] adalah bracket notation, hasilnya undifined karena sudah dihapus
 // potongan B : karena 10000 terhitung sebagai parameter, yg dirujuk oleh this adalah saldo.
 // potongan C : karena pasangannya indeks, bisa eror karena kopi bukan termasuk array (Non-Iterable).
+
+// langkah 2
+
+// Perbaiki 7 Kesalahan
+// Salin kode di bawah di bawah Langkah 1. Kode ini punya 7 kesalahan. Komentar Seharusnya memberi tahu hasil yang benar.
+
+// Nama di kode ini sengaja berbeda dari Langkah 1 agar tidak bentrok.
+
+const warung = {
+  nama: "Warung Senja",
+  saldoKas: 100000,
+
+  // Menambah kas. Seharusnya: setelah tambahKas(50000), saldoKas menjadi 150000
+  tambahKas(jumlah) {
+    this.saldoKas += jumlah;
+    return this.saldoKas;
+  },
+
+//   Mengambil kas. Seharusnya mengembalikan sisa saldoKas
+  ambilKas(jumlah) {
+    this.saldoKas -= jumlah;
+    return this.saldoKas;
+  },
+};
+
+warung.tambahKas(50000);
+console.log(warung.saldoKas);
+console.log(warung.ambilKas(30000));
+
+// // Key dengan tanda hubung. Seharusnya tercetak: 08123
+const kontak = { noWa: "08123" };
+console.log(kontak.noWa);
+
+// // Hapus kataSandi dari akun. Seharusnya tercetak: { nama: 'Rina' }
+const akun = { nama: "Rina", kataSandi: "abc123" };
+delete akun.kataSandi;
+console.log(akun);
+
+// // Cetak semua isi array, satu per baris. Seharusnya: Kopi, Teh, Roti
+const menu = ["Kopi", "Teh", "Roti"];
+for (let item of menu) {
+  console.log(item);
+}
+
+// // Cetak semua properti object. Seharusnya: nama: Warung Senja dan kota: Yogyakarta
+const info = {
+  nama: "Warung Senja",
+  kota: "Yogyakarta"
+};
+
+for (let kolom in info) {
+  console.log(kolom + ": " + info[kolom]);
+}
+
+// // Daftar kunci object. Seharusnya: [ 'nama', 'kota' ]
+console.log(Object.keys(info));
+
+// Yang dikerjakan:
+
+// Perbaiki ke-7 kesalahan. Tandai tiap perbaikan dengan komentar // FIX: ....
+// Hasil akhir di console harus:
+// 150000
+// 120000
+// 08123
+// { nama: 'Rina' }
+// Kopi
+// Teh
+// Roti
+// nama: Warung Senja
+// kota: Yogyakarta
+// [ 'nama', 'kota' ]
+
+
+// 1) Ke-7 kesalahan
+
+//    1. Method tambahKas menulis "saldoKas" tanpa this. → tidak mengakses
+//       properti object, hanya variabel bebas → perbaikannya pakai this.saldoKas.
+//    2. Method ambilKas tidak mengembalikan nilai → hasil pemanggilannya undefined
+//       → perbaikannya tambahkan return this.saldoKas;.
+//    3. Key no-wa diakses dengan notasi titik yang tidak valid untuk nama
+//       ber-tanda-hubung → perbaikannya pakai notasi kurung siku kontak[no-wa].
+//    4. Menghapus properti dengan = undefined tidak benar-benar menghapus key
+//       → perbaikannya pakai "delete akun.kataSandi".
+//    5. Loop array pakai for...in menghasilkan indeks, bukan nilai
+//       → perbaikannya pakai for...of.
+//    6. Loop object pakai for...of memicu TypeError karena object bukan iterable
+//       → perbaikannya pakai for...in.
+//    7. Nama method salah: "Object.key" tidak ada → perbaikannya Object.keys.
+
+// 2) Kesalahan yang MENGHENTIKAN program (error di console):
+// -  "for...of" pada object → TypeError: info is not iterable.
+// - Object.key bukan fungsi → TypeError: Object.key is not a function.
+
+//    Kesalahan yang TIDAK error tapi hasilnya salah:
+// - saldoKas += jumlah → dalam mode non-strict, "saldoKas" dianggap
+//      variabel global baru sehingga tidak error, tapi tidak mengubah object.
+// - ambilKas tanpa return → hasil "undefined", tapi tidak error.
+// - kontak.no-wa → dievaluasi sebagai (kontak.no) - (wa) → NaN, tidak melempar error karena dideklarasikan 
+// - akun.kataSandi = undefined → key masih ada, hanya nilainya undefined.
+// - for...in pada array → mencetak indeks (0,1,2), bukan nilai.
+
+// 3) Beda akun.kataSandi = undefined dan delete akun.kataSandi :
+//    - "akun.kataSandi = undefined" hanya menimpa nilai, tapi key-nya masih ada di object. Cek dengan:
+//          kataSandi in akun   → true
+//      Artinya: key tetap ada, hanya nilainya undefined.
+//    - delete akun.kataSandi benar-benar MENGHAPUS key dari object.
