@@ -152,3 +152,113 @@ console.log(penghitungA());
 // 1. i<2 -> bukan cuma "putaran 1", tapi "putaran 0" dan "putaran 1".
 // 2. penghitungB() -> bukan 4, tapi 1 .
 // Paling sulit: closure Potongan C .
+
+// Langkah 2: Perbaiki 8 Kesalahan
+
+// Cek stok. Seharusnya tercetak: Stok aman
+const stok = 10;
+if (stok > 5) {
+  let pesanStok = "Stok aman";
+  console.log(pesanStok);
+}
+// console.log(pesanStok);
+//fix: console.log didalam
+
+// Potongan 10%. Seharusnya tercetak: 45000
+function hitungPotongan(harga) {
+  const potongan = harga * 0.1;
+  return harga - potongan;
+}
+
+console.log (hitungPotongan(50000));
+// FIX: potongan di luar scope & tidak memanggil hasil fungsi
+
+// Sambutan. Seharusnya tercetak: Selamat datang di Kedai Senja
+// console.log(sambutan());
+const sambutan = function () {
+  return "Selamat datang di Kedai Senja";
+};
+console.log(sambutan());
+// FIX: console.log dipindah ke atas sebelum dipanggil
+
+// Kota. Seharusnya tercetak: Yogyakarta
+// console.log(kota);
+let kota = "Yogyakarta";
+console.log(kota)
+// FIX: deklarasi dipindah sebelum console.log 
+
+// Total awal 100000. Diskon 90000 hanya dipakai di dalam blok.
+// Seharusnya setelah blok, total tetap: 100000
+var total = 100000;
+if (true) {
+  // var total = 90000;
+  let total = 90000;
+}
+console.log(total);
+// FIX: ganti var → let agar tidak menimpa variabel luar
+
+// Saldo kas. Seharusnya setelah tambahKas(50000): 150000
+let saldoKas = 100000;
+function tambahKas(jumlah) {
+  // let saldoKas = 0; // FIX: hapus `let saldoKas = 0;` agar mengubah variabel luar
+  saldoKas += jumlah;
+}
+tambahKas(50000);
+console.log(saldoKas);
+
+// Nomor antrean. Seharusnya tercetak: 1 2 3
+function buatAntrean() {
+    let nomor = 0;
+  return function () {
+    // let nomor = 0;
+    nomor++;
+    return nomor;
+  };
+}
+const ambilNomor = buatAntrean();
+console.log(ambilNomor(), ambilNomor(), ambilNomor());
+
+// Dompet. Seharusnya setelah belanja(30000), cekSaldo() mengembalikan: 70000
+function buatDompet(saldoAwal) {
+  let saldo = saldoAwal;
+  return {
+    belanja(jumlah) {
+      saldo -= jumlah;
+    },
+    cekSaldo() {
+      return saldo; // FIX: ganti `this.saldo` → `saldo`
+    },
+  };
+}
+const dompet = buatDompet(100000);
+dompet.belanja(30000);
+console.log(dompet.cekSaldo());
+
+//jawaban
+
+// 1. memindahkan console kedalam scope
+
+// 2.console.log(potongan) memakai variabel luar scope .
+
+// 3.sambutan dipanggil sebelum dideklarasi (TDZ) → pindahkan deklarasi ke atas.
+
+// 4.kota diakses sebelum let dideklarasi (TDZ) → pindahkan deklarasi ke atas.
+
+//5.var total di dalam blok menimpa variabel luar → ganti jadi let.
+
+//6.let saldoKas = 0; di dalam fungsi membuat variabel lokal → hapus, langsung saldoKas += jumlah.
+
+//7.let nomor = 0; di dalam return function me-reset tiap panggilan → pindahkan ke luar return.
+
+//8.this.saldo di cekSaldo bernilai undefined → ganti return saldo;.
+
+// 2. Error vs hasil salah:
+
+// Error (ReferenceError/TDZ): no. 3 (sambutan) dan no. 4 (kota). No. 2 juga error (potongan is not defined).
+
+// Tidak error tapi hasil salah: no. 1, 5, 6, 7, 8.
+
+// 3. Karena let bersifat block scope — deklarasi di dalam fungsi membuat variabel lokal baru yang menutupi (shadowing) variabel luar. Istilahnya: variable shadowing.
+
+// 4. Karena this di dalam method cekSaldo merujuk ke objek yang dikembalikan ({ belanja, cekSaldo }), yang tidak punya properti saldo — saldo hanya variabel closure di buatDompet. Jadi this.saldo → undefined.
+
