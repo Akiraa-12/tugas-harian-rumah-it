@@ -1,0 +1,3 @@
+nama : fariz
+1 yg dipelajari : scope
+1 yg msh bingung : banyak....

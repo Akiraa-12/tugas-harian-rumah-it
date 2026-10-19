@@ -262,3 +262,113 @@ console.log(dompet.cekSaldo());
 
 // 4. Karena this di dalam method cekSaldo merujuk ke objek yang dikembalikan ({ belanja, cekSaldo }), yang tidak punya properti saldo — saldo hanya variabel closure di buatDompet. Jadi this.saldo → undefined.
 
+//  Langkah 3: Bikin Kasir Sendiri 
+const NAMA_WARUNG = "Warung pakdhe";
+const TARIF_PAJAK = 0.11;
+
+// Syarat 2: dipanggil sebelum didefinisikan (function declaration = hoisting)
+cetakJudul();
+
+function cetakJudul() {
+  console.log(NAMA_WARUNG.toUpperCase());
+}
+
+// Syarat 3 & 4: pabrik kasir dengan data privat (closure)
+function buatKasir(namaKasir, modalAwal) {
+  let saldoKas = modalAwal;
+  let jumlahTransaksi = 0;
+  let riwayat = [];
+
+  return {
+    // Syarat 5
+    catatPenjualan(namaMenu, harga, jumlah) {
+      const subtotal = harga * jumlah;
+      const pajak = subtotal * TARIF_PAJAK; // pakai global scope
+      const total = subtotal + pajak;
+      saldoKas += total;
+      jumlahTransaksi++;
+      riwayat.push({ namaMenu, jumlah, total });
+      return total;
+    },
+    // Syarat 6
+    ambilKas(jumlah) {
+      if (jumlah > saldoKas) return false;
+      saldoKas -= jumlah;
+      return true;
+    },
+    // Syarat 7
+    cekSaldo() {
+      return saldoKas;
+    },
+    lihatRiwayat() {
+      return riwayat.slice(); // salinan, bukan array asli
+    },
+    // Syarat 8
+    ringkasan() {
+      console.log(`Kasir ${namaKasir} | Transaksi: ${jumlahTransaksi} | Saldo: ${saldoKas}`);
+    },
+  };
+}
+
+// Syarat 9: dua kasir
+const kasirPagi = buatKasir("Rina", 100000);
+const kasirMalam = buatKasir("Dodi", 50000);
+
+kasirPagi.catatPenjualan("Kopi", 15000, 2);
+kasirPagi.catatPenjualan("Roti", 10000, 1);
+kasirPagi.catatPenjualan("Teh", 8000, 3);
+
+kasirMalam.catatPenjualan("Nasi Goreng", 20000, 1);
+kasirMalam.catatPenjualan("Es Jeruk", 7000, 2);
+
+console.log(kasirPagi.ambilKas(50000)); // true (berhasil)
+console.log(kasirPagi.ambilKas(999999)); // false (gagal)
+
+kasirPagi.ringkasan();
+kasirMalam.ringkasan();
+
+// Syarat 10: bukti data privat
+console.log(kasirPagi.saldoKas); // undefined
+kasirPagi.saldoKas = 999999;
+console.log(kasirPagi.cekSaldo()); // tetap saldo asli, bukan 999999
+
+// Syarat 11: bukti salinan
+const salinan = kasirPagi.lihatRiwayat();
+salinan.push({ namaMenu: "Palsu", jumlah: 1, total: 0 });
+console.log(salinan.length);            // 4
+console.log(kasirPagi.lihatRiwayat().length); // 3 (asli tidak berubah)
+
+// Syarat 12: pabrik diskon (closure)
+function buatPenghitungDiskon(persen) {
+  return (harga) => harga - harga * (persen / 100);
+}
+const diskon10 = buatPenghitungDiskon(10);
+const diskon25 = buatPenghitungDiskon(25);
+console.log(diskon10(80000)); // 72000
+console.log(diskon25(80000)); // 60000
+
+// Syarat 13: shadowing
+// const nama = "Global";
+function tesShadow() {
+  const nama = "Lokal";
+  console.log(nama); // "Lokal"
+}
+tesShadow();
+console.log(nama); // "Global"
+
+
+// jawaban
+// 1. kasirPagi.saldoKas = undefined karena saldoKas BUKAN properti object, melainkan variabel lokal di dalam closure buatKasir. Method bisa mengaksesnya
+//    karena closure "mengingat" scope tempat ia dibuat.
+
+// 2. saldo kasirPagi & kasirMalam terpisah karena setiap pemanggilan buatKasir membuat closure BARU dengan variabel lokal baru (instance berbeda).
+
+// 3. Setelah buatKasir selesai, yang masih diingat: saldoKas, jumlahTransaksi, riwayat, namaKasir, modalAwal. Tidak hilang karena method-method masih
+//    memegang referensi ke scope tersebut (closure).
+
+// 4. TARIF_PAJAK bisa dipakai karena lexical scope: function mencari variabel ke scope luar (global). Mekanismenya: scope chain / lexical scoping.
+
+// 5. cetakJudul() bisa dipanggil sebelum definisi karena function declaration di-hoist. Jika diubah ke const (function expression), hasilnya:
+//    // ReferenceError: Cannot access 'cetakJudul' before initialization (TDZ — Temporal Dead Zone)
+
+// 6. diskon10(80000) tahu nilai persen karena arrow function yang dikembalikan  "menangkap" parameter persen dari scope buatPenghitungDiskon — inilah closure.
